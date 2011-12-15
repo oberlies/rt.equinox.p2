@@ -55,10 +55,10 @@ public class ValidationDialogServiceUI extends UIServices2 {
 	 * (non-Javadoc)
 	 * @see org.eclipse.equinox.internal.provisional.p2.core.IServiceUI#getUsernamePassword(java.lang.String)
 	 */
-	public AuthenticationInfo getUsernamePassword(final String location) {
+	public AuthenticationInfo getUsernamePassword(final String location) throws IllegalStateException {
 
 		final AuthenticationInfo[] result = new AuthenticationInfo[1];
-		if (!suppressAuthentication() && !isHeadless()) {
+		if (!isHeadless()) {
 			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
 				public void run() {
 					Shell shell = ProvUI.getDefaultParentShell();
@@ -70,8 +70,9 @@ public class ValidationDialogServiceUI extends UIServices2 {
 				}
 
 			});
+			return result[0];
 		}
-		return result[0];
+		throw new IllegalStateException("This method requires a running workbench."); //$NON-NLS-1$
 	}
 
 	private boolean suppressAuthentication() {
@@ -86,13 +87,16 @@ public class ValidationDialogServiceUI extends UIServices2 {
 	 * (non-Javadoc)
 	 * @see org.eclipse.equinox.internal.provisional.p2.core.IServiceUI#showCertificates(java.lang.Object)
 	 */
-	public TrustInfo getTrustInfo(Certificate[][] untrustedChains, final String[] unsignedDetail) {
+	public TrustInfo getTrustInfo(Certificate[][] untrustedChains, final String[] unsignedDetail) throws IllegalStateException {
+		if (isHeadless())
+			throw new IllegalStateException("This method requires a running workbench."); //$NON-NLS-1$
+
 		boolean trustUnsigned = true;
 		boolean persistTrust = false;
 		Certificate[] trusted = new Certificate[0];
 		// Some day we may summarize all of this in one UI, or perhaps we'll have a preference to honor regarding
 		// unsigned content.  For now we prompt separately first as to whether unsigned detail should be trusted
-		if (!isHeadless() && unsignedDetail != null && unsignedDetail.length > 0) {
+		if (unsignedDetail != null && unsignedDetail.length > 0) {
 			final boolean[] result = new boolean[] {false};
 			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
 				public void run() {
@@ -116,7 +120,7 @@ public class ValidationDialogServiceUI extends UIServices2 {
 			return new TrustInfo(trusted, persistTrust, trustUnsigned);
 
 		// We've established trust for unsigned content, now examine the untrusted chains
-		if (!isHeadless() && untrustedChains != null && untrustedChains.length > 0) {
+		if (untrustedChains != null && untrustedChains.length > 0) {
 
 			final Object[] result = new Object[1];
 			final TreeNode[] input = createTreeNodes(untrustedChains);
@@ -157,10 +161,10 @@ public class ValidationDialogServiceUI extends UIServices2 {
 		return children;
 	}
 
-	public AuthenticationInfo getUsernamePassword(final String location, final AuthenticationInfo previousInfo) {
+	public AuthenticationInfo getUsernamePassword(final String location, final AuthenticationInfo previousInfo) throws IllegalStateException {
 
 		final AuthenticationInfo[] result = new AuthenticationInfo[1];
-		if (!suppressAuthentication() && !isHeadless()) {
+		if (!isHeadless()) {
 			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
 				public void run() {
 					Shell shell = ProvUI.getDefaultParentShell();
@@ -177,8 +181,9 @@ public class ValidationDialogServiceUI extends UIServices2 {
 				}
 
 			});
+			return result[0];
 		}
-		return result[0];
+		throw new IllegalStateException("This method requires a running workbench."); //$NON-NLS-1$
 	}
 
 	private boolean isHeadless() {

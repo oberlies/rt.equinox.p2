@@ -109,9 +109,10 @@ public abstract class UIServices {
 	 * Opens a UI prompt for authentication details
 	 * 
 	 * @param location - the location requiring login details, may be <code>null</code>.
-	 * @return The authentication result
+	 * @return The authentication result, or <code>null</code> if the prompt was cancelled by the user.
+	 * @throws IllegalStateException if an UI prompt is (currently) not possible.
 	 */
-	public abstract AuthenticationInfo getUsernamePassword(String location);
+	public abstract AuthenticationInfo getUsernamePassword(String location) throws IllegalStateException;
 
 	/**
 	 * Opens a UI prompt for authentication details when cached or remembered details
@@ -119,9 +120,10 @@ public abstract class UIServices {
 	 * 
 	 * @param location  the location requiring login details
 	 * @param previousInfo - the previously used authentication details - may not be null.
-	 * @return The authentication result
+	 * @return The authentication result, or <code>null</code> if the prompt was cancelled by the user.
+	 * @throws IllegalStateException if an UI prompt is (currently) not possible.
 	 */
-	public abstract AuthenticationInfo getUsernamePassword(String location, AuthenticationInfo previousInfo);
+	public abstract AuthenticationInfo getUsernamePassword(String location, AuthenticationInfo previousInfo) throws IllegalStateException;
 
 	/**
 	 * Opens a UI prompt to capture information about trusted content.
@@ -131,7 +133,8 @@ public abstract class UIServices {
 	 * @param unsignedDetail - an array of strings, where each String describes content that is not signed.
 	 * May be <code>null</code>, which means there is no unsigned content
 	 * @return  the TrustInfo that describes the user's choices for trusting certificates and
-	 * unsigned content. 
+	 * unsigned content.
+	 * @throws IllegalStateException if an UI prompt is (currently) not possible.
 	 */
-	public abstract TrustInfo getTrustInfo(Certificate[][] untrustedChain, String[] unsignedDetail);
+	public abstract TrustInfo getTrustInfo(Certificate[][] untrustedChain, String[] unsignedDetail) throws IllegalStateException;
 }
