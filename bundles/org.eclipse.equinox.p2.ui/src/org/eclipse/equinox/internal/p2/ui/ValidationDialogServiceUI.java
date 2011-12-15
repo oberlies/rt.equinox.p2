@@ -17,6 +17,7 @@ import org.eclipse.equinox.internal.p2.ui.dialogs.TrustCertificateDialog;
 import org.eclipse.equinox.internal.p2.ui.dialogs.UserValidationDialog;
 import org.eclipse.equinox.internal.p2.ui.viewers.CertificateLabelProvider;
 import org.eclipse.equinox.p2.core.UIServices;
+import org.eclipse.equinox.p2.core.UIServices2;
 import org.eclipse.equinox.p2.ui.LoadMetadataRepositoryJob;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -32,7 +33,7 @@ import org.eclipse.ui.PlatformUI;
  * The service declaration is made in the serviceui_component.xml file.
 
  */
-public class ValidationDialogServiceUI extends UIServices {
+public class ValidationDialogServiceUI extends UIServices2 {
 	/**
 	 * Subclassed to add a cancel button to the error dialog.
 	 */
@@ -185,5 +186,10 @@ public class ValidationDialogServiceUI extends UIServices {
 		// assume that the operation should proceed.  See
 		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=291049
 		return !PlatformUI.isWorkbenchRunning();
+	}
+
+	@Override
+	public boolean promptEnabled() {
+		return !isHeadless() && !suppressAuthentication();
 	}
 }

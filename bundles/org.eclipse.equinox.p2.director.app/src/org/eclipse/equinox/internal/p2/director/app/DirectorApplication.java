@@ -34,7 +34,6 @@ import org.eclipse.equinox.p2.engine.*;
 import org.eclipse.equinox.p2.engine.query.UserVisibleRootQuery;
 import org.eclipse.equinox.p2.metadata.*;
 import org.eclipse.equinox.p2.metadata.Version;
-import org.eclipse.equinox.p2.metadata.VersionRange;
 import org.eclipse.equinox.p2.planner.IPlanner;
 import org.eclipse.equinox.p2.planner.IProfileChangeRequest;
 import org.eclipse.equinox.p2.query.*;
@@ -48,7 +47,12 @@ import org.osgi.framework.*;
 import org.osgi.service.packageadmin.PackageAdmin;
 
 public class DirectorApplication implements IApplication, ProvisioningListener {
-	public static class AvoidTrustPromptService extends UIServices {
+	public static class AvoidTrustPromptService extends UIServices2 {
+		@Override
+		public boolean promptEnabled() {
+			return false;
+		}
+
 		@Override
 		public AuthenticationInfo getUsernamePassword(String location) {
 			return null;

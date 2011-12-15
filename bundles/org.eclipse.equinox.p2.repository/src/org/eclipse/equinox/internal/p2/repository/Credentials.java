@@ -222,6 +222,7 @@ public class Credentials {
 				UIServices adminUIService = (UIServices) agent.getService(UIServices.SERVICE_NAME);
 
 				if (adminUIService != null)
+					// serialize the popping of the dialog itself
 					synchronized (promptLock) {
 						try {
 							if (DebugHelper.DEBUG_REPOSITORY_CREDENTIALS) {
@@ -229,18 +230,25 @@ public class Credentials {
 										new Object[] {"host", location}); //$NON-NLS-1$ 					
 							}
 
-							// serialize the popping of the dialog itself
-							loginDetails = lastUsed != null ? adminUIService.getUsernamePassword(host, lastUsed) : adminUIService.getUsernamePassword(host);
-							//null result means user canceled password dialog
-							if (DebugHelper.DEBUG_REPOSITORY_CREDENTIALS) {
-								if (loginDetails == null)
+							final boolean loginWasCancelled;
+							if (adminUIService instanceof UIServices2) {
+								UIServices2 extendedUIService = (UIServices2) adminUIService;
+								loginDetails = lastUsed != null ? extendedUIService.getUsernamePasswordIfPromptEnabled(host, lastUsed) : extendedUIService.getUsernamePasswordIfPromptEnabled(host);
+								loginWasCancelled = extendedUIService.promptEnabled() && loginDetails == null;
+							} else {
+								loginDetails = lastUsed != null ? adminUIService.getUsernamePassword(host, lastUsed) : adminUIService.getUsernamePassword(host);
+								loginWasCancelled = loginDetails == null;
+							}
+							if (loginWasCancelled) {
+								if (DebugHelper.DEBUG_REPOSITORY_CREDENTIALS) {
 									DebugHelper.debug("Credentials", "forLocation:PROMPTED - USER CANCELED (PROMPT LOCK RELEASED)", // //$NON-NLS-1$ //$NON-NLS-2$
 											new Object[] {"host", location}); //$NON-NLS-1$					
-							}
-							if (loginDetails == null) {
+								}
 								rememberCancel(host);
-								throw new LoginCanceledException();
 							}
+							if (loginDetails == null)
+								throw new LoginCanceledException();
+
 							//save user name and password if requested by user
 							if (DebugHelper.DEBUG_REPOSITORY_CREDENTIALS) {
 								if (loginDetails.saveResult())
