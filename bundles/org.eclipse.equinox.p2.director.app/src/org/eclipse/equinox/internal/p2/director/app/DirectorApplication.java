@@ -34,7 +34,6 @@ import org.eclipse.equinox.p2.engine.*;
 import org.eclipse.equinox.p2.engine.query.UserVisibleRootQuery;
 import org.eclipse.equinox.p2.metadata.*;
 import org.eclipse.equinox.p2.metadata.Version;
-import org.eclipse.equinox.p2.metadata.VersionRange;
 import org.eclipse.equinox.p2.planner.IPlanner;
 import org.eclipse.equinox.p2.planner.IProfileChangeRequest;
 import org.eclipse.equinox.p2.query.*;
@@ -71,6 +70,11 @@ public class DirectorApplication implements IApplication, ProvisioningListener {
 				}
 			}
 			return new TrustInfo(trusted, false, true);
+		}
+
+		@Override
+		public int getStatusFlags() {
+			return FLAG_AUTHENTICATION_PROMPT_DISABLED;
 		}
 	}
 

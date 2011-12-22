@@ -31,6 +31,17 @@ public abstract class UIServices {
 	public static final String SERVICE_NAME = UIServices.class.getName();
 
 	/**
+	 * Flag indicating that no UI prompts will be shown by the <code>getUsernamePassword</code> 
+	 * methods of this instance.
+	 * 
+	 * @see #getStatusFlags()
+	 * @see #getUsernamePassword(String)
+	 * @see #getUsernamePassword(String, AuthenticationInfo)
+	 * @since 2.2
+	 */
+	public static final int FLAG_AUTHENTICATION_PROMPT_DISABLED = 0x01;
+
+	/**
 	 * Authentication information returned from an authentication prompt request.
 	 */
 	public static class AuthenticationInfo {
@@ -134,4 +145,16 @@ public abstract class UIServices {
 	 * unsigned content. 
 	 */
 	public abstract TrustInfo getTrustInfo(Certificate[][] untrustedChain, String[] unsignedDetail);
+
+	/**
+	 * Returns information about the status of the {@link UIServices} instance, e.g. if UI prompts 
+	 * are enabled.
+	 * 
+	 * @return a bit set which may have the following bit set: {@link #FLAG_AUTHENTICATION_PROMPT_DISABLED}. 
+	 * All other bits are reserved for future use.
+	 * @since 2.2
+	 */
+	public int getStatusFlags() {
+		return 0;
+	}
 }

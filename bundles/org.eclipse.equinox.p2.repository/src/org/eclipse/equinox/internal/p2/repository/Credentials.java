@@ -222,6 +222,7 @@ public class Credentials {
 				UIServices adminUIService = (UIServices) agent.getService(UIServices.SERVICE_NAME);
 
 				if (adminUIService != null)
+					// serialize the popping of the dialog itself
 					synchronized (promptLock) {
 						try {
 							if (DebugHelper.DEBUG_REPOSITORY_CREDENTIALS) {
@@ -229,18 +230,22 @@ public class Credentials {
 										new Object[] {"host", location}); //$NON-NLS-1$ 					
 							}
 
-							// serialize the popping of the dialog itself
-							loginDetails = lastUsed != null ? adminUIService.getUsernamePassword(host, lastUsed) : adminUIService.getUsernamePassword(host);
-							//null result means user canceled password dialog
-							if (DebugHelper.DEBUG_REPOSITORY_CREDENTIALS) {
-								if (loginDetails == null)
-									DebugHelper.debug("Credentials", "forLocation:PROMPTED - USER CANCELED (PROMPT LOCK RELEASED)", // //$NON-NLS-1$ //$NON-NLS-2$
-											new Object[] {"host", location}); //$NON-NLS-1$					
+							if (promptingIsEnabled(adminUIService)) {
+								loginDetails = lastUsed != null ? adminUIService.getUsernamePassword(host, lastUsed) : adminUIService.getUsernamePassword(host);
+
+								if (loginDetails == null) {
+									//null result means user canceled password dialog
+									if (DebugHelper.DEBUG_REPOSITORY_CREDENTIALS) {
+										DebugHelper.debug("Credentials", "forLocation:PROMPTED - USER CANCELED (PROMPT LOCK RELEASED)", // //$NON-NLS-1$ //$NON-NLS-2$
+												new Object[] {"host", location}); //$NON-NLS-1$					
+									}
+									rememberCancel(host);
+								}
 							}
 							if (loginDetails == null) {
-								rememberCancel(host);
 								throw new LoginCanceledException();
 							}
+
 							//save user name and password if requested by user
 							if (DebugHelper.DEBUG_REPOSITORY_CREDENTIALS) {
 								if (loginDetails.saveResult())
@@ -330,6 +335,10 @@ public class Credentials {
 	 */
 	private static void saveInMemory(String nodeName, UIServices.AuthenticationInfo loginDetails) {
 		savedAuthInfo.put(nodeName, loginDetails);
+	}
+
+	private static boolean promptingIsEnabled(UIServices adminUIService) {
+		return 0 == (adminUIService.getStatusFlags() & UIServices.FLAG_AUTHENTICATION_PROMPT_DISABLED);
 	}
 
 	/**

@@ -186,4 +186,15 @@ public class ValidationDialogServiceUI extends UIServices {
 		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=291049
 		return !PlatformUI.isWorkbenchRunning();
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.equinox.p2.core.UIServices#getStatusFlags()
+	 */
+	@Override
+	public int getStatusFlags() {
+		if (isHeadless() || suppressAuthentication()) {
+			return FLAG_AUTHENTICATION_PROMPT_DISABLED;
+		}
+		return 0;
+	}
 }
